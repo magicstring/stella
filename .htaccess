@@ -1,0 +1,5 @@
+# Keep setup files and notes off the web
+<FilesMatch "\.(sql|md)$">
+  Require all denied
+</FilesMatch>
+Options -Indexes

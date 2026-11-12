@@ -1,0 +1,4 @@
+type,name,platform,velocity,note,seen_at
+hashtag,#ExampleHashtag,TikTok,80,Replace these example rows with real trends,2026-11-11
+sound,Example sound name,TikTok,65,type is one of: sound format hashtag product angle,2026-11-11
+format,Example format,Instagram,50,platform can be blank for all platforms,2026-11-11
