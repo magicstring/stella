@@ -1,0 +1,34 @@
+# Auto-deploy to Hostinger on every push to main.
+# SAFETY: config.php on the server holds the real xAI API keys and
+# is ALWAYS excluded from deploys. It is untracked in git, so it is
+# not in the deploy tree either. Never commit it.
+# The deploy tree is built with `git archive`, so .git never reaches the server.
+# Upload-only: never deletes remote files, so stray server files are left alone.
+# TARGET: stella.saile.asia, folder /public_html/stella. The FTP account
+# u436846173.stella is a dedicated Hostinger FTP account jailed to that
+# folder (same pattern as the dev-pro account), so the mirror target is
+# the account root, ./ . If a future FTP account lands elsewhere, change
+# the mirror target below from ./ to that folder.
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build clean deploy tree
+        run: |
+          mkdir -p deploy
+          git archive HEAD | tar -x -C deploy
+
+      - name: Deploy via FTP
+        env:
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+          lftp -c "set ssl:verify-certificate no; open -u '${{ secrets.FTP_USERNAME }}','$FTP_PASSWORD' 'ftp://${{ secrets.FTP_SERVER }}'; mirror --reverse --only-newer --exclude 'config.php' --exclude '.github/' ./deploy/ ./"
