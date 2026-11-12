@@ -272,7 +272,7 @@ tailwind.config = {
           <span id="bellCount" class="<?= $d['alerts'] ? '' : 'hidden ' ?>absolute -right-1 -top-1 min-w-[18px] rounded-full bg-sea px-1 text-center text-[11px] font-semibold leading-[18px] text-white tabular-nums"><?= (int)$d['alerts'] ?></span>
         </a>
         <a href="accounts.php" data-nav class="flex shrink-0 items-center gap-2 rounded-full border border-line bg-white p-1 sm:pr-3 text-sm hover:border-sea" title="Channels">
-          <span class="flex -space-x-2"><span class="sr-only">Channels</span>
+          <span class="sr-only">Channels</span><span class="flex -space-x-2">
             <?php if (!$connected): ?><span class="inline-flex w-7 h-7 items-center justify-center rounded-full bg-line text-muted"><?= nav_icon('plus') ?></span><?php endif; ?>
             <?php foreach ($connected as $p): ?><span class="rounded-full ring-2 ring-white"><?= platform_badge($p['name'], 'w-7 h-7 text-[10px]') ?></span><?php endforeach; ?>
           </span>

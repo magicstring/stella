@@ -214,27 +214,40 @@ $composePlatforms = array_map(fn($p) => ['id' => (int)$p['id'], 'name' => $p['na
 page_header('Create New Post', 'help.php');
 ?>
 <style>
-  .sos-bezel { background: linear-gradient(#EFEFF3, #DADAE1); box-shadow: inset 0 3px 8px rgba(0,0,0,.16), 0 1px 0 #fff; }
-  .sos-btn {
-    width: 196px; height: 196px; border-radius: 9999px; color: #fff;
-    background: radial-gradient(circle at 35% 28%, #E25AAE 0%, <?= BRAND['sea'] ?> 48%, #7A0C53 100%);
-    box-shadow: 0 11px 0 #5E0940, 0 24px 34px rgba(94,9,64,.26), inset 0 -8px 16px rgba(0,0,0,.2), inset 0 6px 10px rgba(255,255,255,.2);
-    transition: transform .12s ease, box-shadow .12s ease, filter .2s;
-  }
-  .sos-btn:hover:not(:disabled) { filter: brightness(1.06); }
-  .sos-btn:active:not(:disabled), .sos-btn.pressed {
-    transform: translateY(9px);
-    box-shadow: 0 2px 0 #5E0940, 0 8px 14px rgba(94,9,64,.24), inset 0 -4px 10px rgba(0,0,0,.25), inset 0 6px 10px rgba(255,255,255,.12);
-  }
-  .sos-btn:disabled:not(.pressed) { filter: grayscale(.7) brightness(1.05); cursor: not-allowed; }
-  .sos-btn.pop { animation: pop .45s cubic-bezier(.2,1.6,.4,1); }
-  @keyframes pop { 0% { transform: translateY(9px); } 60% { transform: translateY(-6px) scale(1.03); } 100% { transform: none; } }
-  .sonar { position: absolute; inset: 0; margin: auto; width: 232px; height: 232px; border-radius: 9999px; border: 3px solid <?= BRAND['sea'] ?>; opacity: 0; pointer-events: none; }
-  .busy .sonar { animation: sonar 1.8s cubic-bezier(.2,.6,.3,1) infinite; }
-  .busy .sonar:nth-child(2) { animation-delay: .6s; } .busy .sonar:nth-child(3) { animation-delay: 1.2s; }
-  @keyframes sonar { 0% { transform: scale(.85); opacity: .5; } 100% { transform: scale(1.7); opacity: 0; } }
-  .flash .sonar:first-child { animation: flash .5s ease-out; }
-  @keyframes flash { 0% { transform: scale(.85); opacity: .9; border-width: 8px; } 100% { transform: scale(1.4); opacity: 0; } }
+  /* Create button: a calm brand button with a living constellation above it */
+  .cta { display: inline-flex; align-items: center; gap: 10px; border-radius: 16px; padding: 16px 30px; color: #fff;
+    background: <?= BRAND['sea'] ?>; box-shadow: 0 14px 30px -12px rgba(82,54,224,.65), inset 0 1px 0 rgba(255,255,255,.18);
+    transition: transform .15s ease, background-color .2s, box-shadow .2s; }
+  .cta:hover:not(:disabled) { background: <?= BRAND['seadeep'] ?>; transform: translateY(-1px); box-shadow: 0 18px 34px -12px rgba(82,54,224,.7); }
+  .cta:active:not(:disabled), .cta.pressed { transform: scale(.97); }
+  .cta:disabled:not(.pressed) { opacity: .45; cursor: not-allowed; box-shadow: none; }
+  .busy .cta { background: linear-gradient(100deg, <?= BRAND['sea'] ?> 30%, #8B7BFF 50%, <?= BRAND['sea'] ?> 70%); background-size: 300% 100%; animation: ctaShine 1.6s linear infinite; }
+  @keyframes ctaShine { to { background-position: -100% 0; } }
+  .cta .cta-spark { animation: none; transform-origin: center; }
+  .busy .cta .cta-spark { animation: spin 1.4s linear infinite; }
+  .cta.pop { animation: ctaPop .45s cubic-bezier(.2,1.6,.4,1); }
+  @keyframes ctaPop { 0% { transform: scale(.97); } 60% { transform: scale(1.04); } 100% { transform: none; } }
+
+  #constellation { width: 260px; height: 184px; overflow: visible; }
+  #constellation .bg { fill: #8B7BFF; animation: twinkle 3s ease-in-out infinite; }
+  #csLine { fill: none; stroke: #C9C0F7; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: stroke .4s, opacity .4s; }
+  .busy #csLine { stroke: #8B7BFF; stroke-dasharray: 7 6; animation: march .9s linear infinite; }
+  @keyframes march { to { stroke-dashoffset: -13; } }
+  #constellation .dot { fill: <?= BRAND['sea'] ?>; transition: fill .4s; }
+  .busy #constellation .dot { animation: twinkle 1.2s ease-in-out infinite; }
+  #constellation .cs:nth-child(3) .dot { animation-delay: .2s; } #constellation .cs:nth-child(4) .dot { animation-delay: .4s; }
+  #constellation .cs:nth-child(5) .dot { animation-delay: .6s; } #constellation .cs:nth-child(6) .dot { animation-delay: .8s; }
+  #constellation .cs:nth-child(7) .dot { animation-delay: 1s; } #constellation .cs:nth-child(8) .dot { animation-delay: .3s; }
+  @keyframes twinkle { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  #csLead { transform-box: fill-box; transform-origin: center; filter: drop-shadow(0 0 6px rgba(255,184,46,.65)); }
+  .busy #csLead { animation: spin 2.4s linear infinite; }
+  .burst #csLead { animation: burst .8s cubic-bezier(.2,1.6,.4,1); }
+  @keyframes burst { 0% { transform: scale(1); } 45% { transform: scale(1.9) rotate(45deg); } 100% { transform: scale(1); } }
+  .shoot { stroke: url(#shootGrad); stroke-width: 2; stroke-linecap: round; opacity: 0; }
+  .busy .shoot { animation: shoot 2.6s ease-out infinite; }
+  .busy .shoot.s2 { animation-delay: 1.3s; }
+  @keyframes shoot { 0% { opacity: 0; transform: translate(0, 0); } 8% { opacity: 1; } 30% { opacity: 0; transform: translate(-70px, 40px); } 100% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .busy .cta, .busy .cta .cta-spark, #constellation .bg, .busy #constellation .dot, .busy #csLine, .busy #csLead, .burst #csLead, .busy .shoot, .cta.pop { animation: none !important; } }
   .reveal > * { animation: rise .45s cubic-bezier(.2,.8,.2,1) both; }
   .reveal > *:nth-child(2) { animation-delay: .08s; } .reveal > *:nth-child(3) { animation-delay: .16s; } .reveal > *:nth-child(4) { animation-delay: .24s; }
   @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
@@ -415,18 +428,24 @@ page_header('Create New Post', 'help.php');
     </div>
   </div>
 
-  <!-- The big button -->
+  <!-- Create button with the constellation -->
   <div class="flex flex-col items-center justify-center border-t border-line bg-gradient-to-b from-foam/70 to-white px-6 py-6 sm:py-10 text-center lg:border-l lg:border-t-0">
-    <div id="sosWrap" class="relative grid h-[260px] w-[260px] place-items-center">
-      <span class="sonar"></span><span class="sonar"></span><span class="sonar"></span>
-      <div class="sos-bezel grid place-items-center rounded-full p-[12px]">
-        <button id="sosBtn" type="submit" class="sos-btn grid place-items-center">
-          <span>
-            <svg class="mx-auto mb-1" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="m5.6 5.6 3.6 3.6M14.8 14.8l3.6 3.6M18.4 5.6l-3.6 3.6M9.2 14.8l-3.6 3.6"/></svg>
-            <span id="sosLabel" class="block font-display text-xl sm:text-2xl lg:text-3xl font-extrabold leading-none">Help me</span>
-          </span>
-        </button>
-      </div>
+    <div id="sosWrap" class="relative flex flex-col items-center">
+      <svg id="constellation" viewBox="0 0 240 170" aria-hidden="true">
+        <defs><linearGradient id="shootGrad" x1="0" x2="1"><stop offset="0" stop-color="#FFB82E"/><stop offset="1" stop-color="#FFB82E" stop-opacity="0"/></linearGradient></defs>
+        <g id="csBg"><circle class="bg" cx="18" cy="30" r="1.4"/><circle class="bg" cx="214" cy="22" r="1.2" style="animation-delay:.7s"/><circle class="bg" cx="226" cy="120" r="1.6" style="animation-delay:1.4s"/><circle class="bg" cx="30" cy="148" r="1.2" style="animation-delay:2s"/><circle class="bg" cx="196" cy="160" r="1.3" style="animation-delay:.4s"/><circle class="bg" cx="8" cy="92" r="1.1" style="animation-delay:1.1s"/></g>
+        <line class="shoot" x1="200" y1="14" x2="226" y2="0"/><line class="shoot s2" x1="60" y1="20" x2="86" y2="6"/>
+        <g id="csGroup">
+          <polyline id="csLine" points=""/>
+          <g class="cs"><path id="csLead" fill="#FFB82E" d="M0 -11C1.2 -1.2 1.2 -1.2 11 0C1.2 1.2 1.2 1.2 0 11C-1.2 1.2 -1.2 1.2 -11 0C-1.2 -1.2 -1.2 -1.2 0 -11Z"/></g>
+          <g class="cs"><circle class="dot" r="4.4"/></g><g class="cs"><circle class="dot" r="5.2"/></g><g class="cs"><circle class="dot" r="4"/></g>
+          <g class="cs"><circle class="dot" r="5.2"/></g><g class="cs"><circle class="dot" r="4.4"/></g><g class="cs"><circle class="dot" r="5.8"/></g>
+        </g>
+      </svg>
+      <button id="sosBtn" type="submit" class="cta -mt-2 font-display text-lg sm:text-xl font-extrabold">
+        <svg class="cta-spark" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="#FFB82E" d="M12 1c.6 5.2 1.8 6.4 7 7-5.2.6-6.4 1.8-7 7-.6-5.2-1.8-6.4-7-7 5.2-.6 6.4-1.8 7-7z"/></svg>
+        <span id="sosLabel">Create my post</span>
+      </button>
     </div>
     <p id="sosSummary" class="mt-4 text-sm font-semibold"></p>
     <p id="sosStatus" role="status" aria-live="polite" class="mt-1 text-sm text-muted">Press when you're ready</p>
@@ -793,6 +812,44 @@ if (SAVED_HELP) {
   }
 }
 
+// ---------- The constellation above the button ----------
+// Idle: Stella's S constellation breathes gently. Working: stars scatter, gather into the S, then drift and orbit
+// while the lines march between them. Done: the lead star bursts and everything settles.
+const CS_STAGE = document.getElementById('constellation');
+const CS_PTS = [[46, 12], [25, 12], [16, 22], [32, 32], [48, 42], [40, 52], [18, 52]].map(([x, y]) => [x * 2.6 + 37, y * 2.6 + 2]);
+const csStars = [...CS_STAGE.querySelectorAll('.cs')], csLine = document.getElementById('csLine'), csGroup = document.getElementById('csGroup');
+const CS_REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let csMode = 'idle', csFrom = null, csGather = 0;
+const csT0 = performance.now();
+function csDraw(pts, rot) {
+  pts.forEach((p, i) => csStars[i].setAttribute('transform', `translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})`));
+  csLine.setAttribute('points', pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '));
+  csGroup.setAttribute('transform', `rotate(${rot.toFixed(2)} 120 85)`);
+}
+function csFrame(now) {
+  const t = (now - csT0) / 1000, busy = csMode === 'busy', amp = busy ? 7 : 2;
+  let pts = CS_PTS.map(([x, y], i) => [x + Math.sin(t * (busy ? 2.1 : 1.1) + i * 1.7) * amp, y + Math.cos(t * (busy ? 1.8 : .9) + i * 2.3) * amp]);
+  if (csFrom) {
+    const k = Math.min(1, (now - csGather) / 950), e = 1 - Math.pow(1 - k, 3);
+    pts = pts.map((p, i) => [csFrom[i][0] + (p[0] - csFrom[i][0]) * e, csFrom[i][1] + (p[1] - csFrom[i][1]) * e]);
+    csLine.style.opacity = e;
+    if (k >= 1) csFrom = null;
+  }
+  csDraw(pts, busy ? Math.sin(t * .9) * 9 : 0);
+  requestAnimationFrame(csFrame);
+}
+if (CS_REDUCE) csDraw(CS_PTS, 0); else requestAnimationFrame(csFrame);
+function constellation(state) {
+  wrap.classList.toggle('busy', state === 'busy');
+  if (state === 'busy') {
+    csMode = 'busy';
+    if (!CS_REDUCE) { csFrom = CS_PTS.map(() => [10 + Math.random() * 220, 10 + Math.random() * 150]); csGather = performance.now(); }
+  } else {
+    csMode = 'idle';
+    if (state === 'done') { wrap.classList.add('burst'); setTimeout(() => wrap.classList.remove('burst'), 850); }
+  }
+}
+
 // ---------- The button ----------
 form.addEventListener('submit', async ev => {
   ev.preventDefault();
@@ -802,9 +859,8 @@ form.addEventListener('submit', async ev => {
 
   btn.classList.add('pressed');
   btn.disabled = true;
-  wrap.classList.add('flash');
-  setTimeout(() => { wrap.classList.remove('flash'); wrap.classList.add('busy'); }, 250);
-  document.getElementById('sosLabel').textContent = 'On it';
+  constellation('busy');
+  document.getElementById('sosLabel').textContent = 'Stella is on it…';
   status.textContent = 'Writing your post and reading competitor posts…';
   try {
     const fd = new FormData(form);
@@ -817,17 +873,18 @@ form.addEventListener('submit', async ev => {
     const data = await api('help.php', fd);
     chosenImage = null;
     render(data, true);
-    status.textContent = 'Done. Your help is below.';
+    status.textContent = 'Done. Your post is below.';
+    constellation('done');
     document.getElementById('results').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
   } catch (e) {
     err.textContent = e.message;
     status.textContent = 'Press to try again';
   }
-  wrap.classList.remove('busy');
+  if (wrap.classList.contains('busy')) constellation('idle');
   btn.classList.remove('pressed');
   btn.classList.add('pop');
   setTimeout(() => btn.classList.remove('pop'), 500);
-  document.getElementById('sosLabel').textContent = 'Help me';
+  document.getElementById('sosLabel').textContent = 'Create my post';
   syncSummary();
 });
 
