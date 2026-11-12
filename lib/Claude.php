@@ -24,6 +24,9 @@ class Claude {
                         [['type' => 'text', 'text' => $user]]) : $user],
                 ],
             ];
+            // Reasoning models (like grok-4.7) are much faster on low effort. Set XAI_REASONING_EFFORT to '' to leave it out.
+            $effort = defined('XAI_REASONING_EFFORT') ? XAI_REASONING_EFFORT : 'low';
+            if ($effort !== '') $payload['reasoning_effort'] = $effort;
         } else {
             $url = 'https://api.anthropic.com/v1/messages';
             $headers = ['content-type: application/json', 'x-api-key: ' . CLAUDE_API_KEY, 'anthropic-version: 2023-06-01'];
@@ -41,7 +44,7 @@ class Claude {
         curl_setopt_array($ch, [
             CURLOPT_POST           => true,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 90,
+            CURLOPT_TIMEOUT        => defined('AI_TIMEOUT') ? (int)AI_TIMEOUT : 55,   // stay under the host's gateway limit (Hostinger answers 504 after about 60s)
             CURLOPT_HTTPHEADER     => $headers,
             CURLOPT_POSTFIELDS     => json_encode($payload),
         ]);
@@ -52,6 +55,9 @@ class Claude {
 
         $name = self::provider() === 'xai' ? 'Grok' : 'Claude';
         if ($raw === false) {
+            if (stripos($error, 'timed out') !== false) {
+                throw new RuntimeException("$name took too long to answer. Try again, pick fewer parts at once, or use a faster model in config.php.");
+            }
             throw new RuntimeException("$name request failed: $error");
         }
         $data = json_decode($raw, true);
